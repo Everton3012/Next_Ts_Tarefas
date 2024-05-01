@@ -5,7 +5,7 @@ import heroImg from "../../public/assets/hero.png";
 
 export default function Home() {
   return (
-    <div className={styles["container"]}>
+    <section className={styles["container"]}>
       <Head>
         <title>Tarefas+ | Organize suas tarefas de forma fácil</title>
       </Head>
@@ -23,7 +23,16 @@ export default function Home() {
             seus estudos e tarefas
           </h1>
         </div>
+
+        <div className={styles["infoContent"]}>
+          <section className={styles["box"]}>
+            <span>+12 posts</span>
+          </section>
+          <section className={styles["box"]}>
+            <span>+90 comentarios</span>
+          </section>
+        </div>
       </main>
-    </div>
+    </section>
   );
 }
