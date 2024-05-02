@@ -11,7 +11,7 @@ export function Header() {
                         <h1 className={styles["logo"]}>Tareafas<span>+</span></h1>
                     </Link>
                     <Link className={styles["link"]} href={"/dashboard"}>
-                        Meu Paienl
+                        Meu Painel
                     </Link>
                 </nav>
                 <button className={styles["loginButton"]}>Acessar</button>
