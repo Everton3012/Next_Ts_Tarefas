@@ -1,3 +1,5 @@
+import { useState, useEffect, ChangeEvent, FormEvent } from "react";
+
 import { GetServerSideProps } from "next";
 import styles from "./style.module.css";
 import Head from "next/head";
@@ -8,6 +10,21 @@ import { FiShare2 } from "react-icons/fi";
 import { FaTrash } from "react-icons/fa";
 
 export default function Dashboard() {
+  const [input, setInput] = useState<string>("");
+  const [publicTask, setPublicTask] = useState<boolean>(false);
+
+  function handleChangePublic(e:ChangeEvent<HTMLInputElement>){
+    setPublicTask(e.target.checked);
+  }
+
+  function handleRegisterTask(e:FormEvent){
+    e.preventDefault();
+
+    if(input === "") return;
+
+    alert("TESTE");
+  }
+
   return (
     <section className={styles["container"]}>
       <Head>
@@ -17,10 +34,21 @@ export default function Dashboard() {
         <section className={styles["content"]}>
           <div className={styles["contentForm"]}>
             <h1 className={styles["title"]}>Qual a sua tarefa?</h1>
-            <form>
-              <Textarea placeholder="Digite qual a sua tarefa..." />
+            <form onSubmit={handleRegisterTask}>
+              <Textarea
+                value={input}
+                onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+                  setInput(e.target.value)
+                }
+                placeholder="Digite qual a sua tarefa..."
+              />
               <div className={styles["checkBoxArea"]}>
-                <input type="checkbox" className={styles["checkBox"]} />
+                <input
+                  type="checkbox"
+                  className={styles["checkBox"]}
+                  checked={publicTask}
+                  onChange={handleChangePublic}
+                />
                 <label>Deixar tarefa publica?</label>
               </div>
               <button className={styles["button"]} type="submit">
@@ -41,7 +69,7 @@ export default function Dashboard() {
             <div className={styles["taskContent"]}>
               <p>Minha primeira tarefa</p>
               <button className={styles["trashButton"]}>
-                <FaTrash size={24} color="ea3140"/>
+                <FaTrash size={24} color="ea3140" />
               </button>
             </div>
           </article>
@@ -55,7 +83,7 @@ export default function Dashboard() {
             <div className={styles["taskContent"]}>
               <p>Minha primeira tarefa</p>
               <button className={styles["trashButton"]}>
-                <FaTrash size={24} color="ea3140"/>
+                <FaTrash size={24} color="ea3140" />
               </button>
             </div>
           </article>
