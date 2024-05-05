@@ -35,6 +35,7 @@
 .checkBox {
     width: 18px;
     height: 18px;
+    cursor: pointer;
 }
 
 .button {
@@ -45,6 +46,12 @@
     background-color: #3183ff;
     padding: 12px 0;
     font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.button:active {
+    background-color: #319fff;
 }
 
 .taskContainer {

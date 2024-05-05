@@ -9,20 +9,42 @@ import Textarea from "../../components/textarea";
 import { FiShare2 } from "react-icons/fi";
 import { FaTrash } from "react-icons/fa";
 
-export default function Dashboard() {
+import { db } from "../../config/firebase.conection";
+
+import { addDoc, collection } from "firebase/firestore";
+
+interface HomeProps {
+  user: {
+    email: string;
+  };
+}
+
+export default function Dashboard({ user }: HomeProps) {
   const [input, setInput] = useState<string>("");
   const [publicTask, setPublicTask] = useState<boolean>(false);
 
-  function handleChangePublic(e:ChangeEvent<HTMLInputElement>){
+  function handleChangePublic(e: ChangeEvent<HTMLInputElement>) {
     setPublicTask(e.target.checked);
   }
 
-  function handleRegisterTask(e:FormEvent){
+  async function handleRegisterTask(e: FormEvent) {
     e.preventDefault();
 
-    if(input === "") return;
+    if (input === "") return;
 
-    alert("TESTE");
+    try {
+      await addDoc(collection(db, "tarefas"), {
+        tarefa: input,
+        created: new Date(),
+        user: user?.email,
+        public: publicTask,
+      });
+
+      setInput("");
+      setPublicTask(false);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
@@ -106,6 +128,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     };
   }
   return {
-    props: {},
+    props: {
+      user: {
+        email: session?.user.email,
+      },
+    },
   };
 };
