@@ -11,7 +11,18 @@ import { FaTrash } from "react-icons/fa";
 
 import { db } from "../../config/firebase.conection";
 
-import { addDoc, collection } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  query,
+  orderBy,
+  where,
+  onSnapshot,
+  snapshotEqual,
+  doc,
+  deleteDoc,
+} from "firebase/firestore";
+import Link from "next/link";
 
 interface HomeProps {
   user: {
@@ -19,9 +30,44 @@ interface HomeProps {
   };
 }
 
+interface TaskProps {
+  id: string;
+  created: Date;
+  public: boolean;
+  tarefa: string;
+  user: string;
+}
+
 export default function Dashboard({ user }: HomeProps) {
   const [input, setInput] = useState<string>("");
   const [publicTask, setPublicTask] = useState<boolean>(false);
+  const [tasks, setTasks] = useState<TaskProps[]>([]);
+
+  useEffect(() => {
+    async function loadTarefas() {
+      const tarefasRef = collection(db, "tarefas");
+      const q = query(
+        tarefasRef,
+        orderBy("created", "desc"),
+        where("user", "==", user?.email)
+      );
+
+      onSnapshot(q, (snapshot) => {
+        let lista = [] as TaskProps[];
+        snapshot.forEach((doc) => {
+          lista.push({
+            id: doc.id,
+            tarefa: doc.data().tarefa,
+            created: doc.data().created,
+            user: doc.data().user,
+            public: doc.data().public,
+          });
+        });
+        setTasks(lista);
+      });
+    }
+    loadTarefas();
+  }, [user?.email]);
 
   function handleChangePublic(e: ChangeEvent<HTMLInputElement>) {
     setPublicTask(e.target.checked);
@@ -45,6 +91,18 @@ export default function Dashboard({ user }: HomeProps) {
     } catch (error) {
       console.log(error);
     }
+  }
+
+  async function handleShare(id: string) {
+    await navigator.clipboard.writeText(
+      `${process.env.NEXT_PUBLIC_URL}/task/${id}`
+    )
+
+    alert("url copiada com sucesso")
+  }
+  async function handleDeleteTask(id: string) {
+    const docRef = doc(db, "tarefas", id)
+    await deleteDoc(docRef);
   }
 
   return (
@@ -81,34 +139,34 @@ export default function Dashboard({ user }: HomeProps) {
         </section>
         <section className={styles["taskContainer"]}>
           <h1>Minhas tarefas</h1>
-          <article className={styles["task"]}>
-            <div className={styles["tagContainer"]}>
-              <label className={styles["tag"]}>PUBLICO</label>
-              <button className={styles["shareButton"]}>
-                <FiShare2 size={22} color="#3183ff" />
-              </button>
-            </div>
-            <div className={styles["taskContent"]}>
-              <p>Minha primeira tarefa</p>
-              <button className={styles["trashButton"]}>
-                <FaTrash size={24} color="ea3140" />
-              </button>
-            </div>
-          </article>
-          <article className={styles["task"]}>
-            <div className={styles["tagContainer"]}>
-              <label className={styles["tag"]}>PUBLICO</label>
-              <button className={styles["shareButton"]}>
-                <FiShare2 size={22} color="#3183ff" />
-              </button>
-            </div>
-            <div className={styles["taskContent"]}>
-              <p>Minha primeira tarefa</p>
-              <button className={styles["trashButton"]}>
-                <FaTrash size={24} color="ea3140" />
-              </button>
-            </div>
-          </article>
+          {tasks &&
+            tasks.map((item) => (
+              <article key={item.id} className={styles["task"]}>
+                {item.public && (
+                  <div className={styles["tagContainer"]}>
+                    <label className={styles["tag"]}>PUBLICO</label>
+                    <button
+                      className={styles["shareButton"]}
+                      onClick={() => handleShare(item.id)}
+                    >
+                      <FiShare2 size={22} color="#3183ff" />
+                    </button>
+                  </div>
+                )}
+                <div className={styles["taskContent"]}>
+                  {item.public ? (
+                    <Link href={`/task/${item.id}`}>
+                      <p>{item.tarefa}</p>
+                    </Link>
+                  ) : (
+                    <p>{item.tarefa}</p>
+                  )}
+                  <button onClick={() => handleDeleteTask(item.id)} className={styles["trashButton"]}>
+                    <FaTrash size={24} color="ea3140" />
+                  </button>
+                </div>
+              </article>
+            ))}
         </section>
       </main>
     </section>
