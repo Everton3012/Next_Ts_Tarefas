@@ -1,6 +1,5 @@
 import { useSession, signIn, signOut } from "next-auth/react";
 import Link from "next/link";
-
 import styles from "./styles.module.css";
 
 export function Header() {
@@ -12,7 +11,7 @@ export function Header() {
         <nav className={styles["nav"]}>
           <Link href={"/"}>
             <h1 className={styles["logo"]}>
-              Tareafas<span>+</span>
+              Tarefas<span>+</span>
             </h1>
           </Link>
           {session?.user && (
